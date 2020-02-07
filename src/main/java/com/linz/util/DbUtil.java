@@ -13,12 +13,16 @@ public class DbUtil {
         return this.connection;
     }
 
+    public DbUtil() {
+        this.getDbConnection();
+    }
+
     /**
      * 链接数据库，返回连接对象
      *
-     * @return Connection
      */
-    private Connection getDbConnection() {
+    private void getDbConnection() {
+
         final String SERVER = "localhost";
         final String DBNAME = "manger_web";
 
@@ -33,7 +37,6 @@ public class DbUtil {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-        return connection;
     }
 
     /**
@@ -44,7 +47,7 @@ public class DbUtil {
      * @return ResultSet 数据集
      */
     public ResultSet executeQuery(String preparedSql, ArrayList<Object> params) {
-        connection = this.getDbConnection();
+
         try {
             preparedStatement = connection.prepareStatement(preparedSql);
             if (params != null && !params.isEmpty()) {
@@ -69,7 +72,7 @@ public class DbUtil {
      * @return boolean 是否成功
      */
     public boolean executeUpdate(String preparedSql, ArrayList<Object> params) throws SQLException {
-        connection = this.getDbConnection();
+
         int num = -1;
 
         preparedStatement = connection.prepareStatement(preparedSql);
@@ -85,23 +88,24 @@ public class DbUtil {
 
     //关闭数据库连接
     public void closeDbConnection() {
+
         try {
-            if (resultSet != null) {
-                resultSet.close();
+            if (this.resultSet != null) {
+                this.resultSet.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
+                if (this.preparedStatement != null) {
+                    this.preparedStatement.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (connection != null) {
-                        connection.close();
+                    if (this.connection != null) {
+                        this.connection.close();
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();

@@ -21,6 +21,7 @@ public class AddArticle extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         String title = req.getParameter("title");
         String content = req.getParameter("content");
         Long user_id = Long.parseLong(req.getParameter("user_id"));
@@ -44,7 +45,6 @@ public class AddArticle extends HttpServlet {
         boolean isSuccess;
         try {
             isSuccess = dbUtil.executeUpdate(sql, paraList);
-
             if (isSuccess) {
                 printWriter.write(Result.success().toString());
             } else {

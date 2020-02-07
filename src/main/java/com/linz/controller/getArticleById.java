@@ -1,6 +1,8 @@
 package com.linz.controller;
 
+import com.linz.service.ArticleService;
 import com.linz.util.DbUtil;
+import com.linz.util.IpAddressUtil;
 import com.linz.util.Result;
 import com.linz.util.ResultCode;
 import com.mysql.cj.util.StringUtils;
@@ -25,6 +27,10 @@ public class getArticleById extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String article_id = req.getParameter("article_id");
         long long_article_id;
+
+        // ip 地址
+        final String ipAddress = IpAddressUtil.getIpAddress(req);
+
 
         PrintWriter printWriter = resp.getWriter();
         DbUtil dbUtil = new DbUtil();
@@ -65,13 +71,11 @@ public class getArticleById extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-
             JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
             try {
                 while (resultSet.next()) {
-                    HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                    HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("article_id", resultSet.getLong("article_id"));
                     hashMap.put("user_id", resultSet.getLong("user_id"));
                     hashMap.put("article_content", resultSet.getString("article_content"));
@@ -83,6 +87,8 @@ public class getArticleById extends HttpServlet {
                     hashMap.put("username", resultSet.getString("username"));
                     hashMap.put("label_parent_name", resultSet.getString("label_parent_name"));
                     hashMap.put("label_name", resultSet.getString("label_name"));
+                    boolean commend = ArticleService.isCommend(ipAddress, resultSet.getLong("article_id"));
+                    hashMap.put("isCommend", commend);
                     jsonArray.add(hashMap);
                 }
                 // 统一格式返回体
@@ -94,8 +100,6 @@ public class getArticleById extends HttpServlet {
             dbUtil.closeDbConnection();
 
             printWriter.write(jsonObject.toString());
-
-
         } else {
             printWriter.write(Result.failure(ResultCode.PARAM_IS_BLANK).toString());
         }

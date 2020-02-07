@@ -1,6 +1,8 @@
 package com.linz.controller;
 
+import com.linz.service.ArticleService;
 import com.linz.util.DbUtil;
+import com.linz.util.IpAddressUtil;
 import com.linz.util.Result;
 import com.mysql.cj.xdevapi.JsonArray;
 import net.sf.json.JSONArray;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -26,10 +29,12 @@ public class ArticleList extends HttpServlet {
         System.out.println(req.getParameter("pageSize"));
         int pageSize = Integer.parseInt(req.getParameter("pageSize"));     // 数据条数
         int currentPage = Integer.parseInt(req.getParameter("currentPage")); // 第几页
-
         int start = (currentPage - 1) * pageSize;
         System.out.println("start -->" + start);
         DbUtil dbUtil = new DbUtil();
+        // ip 地址
+        final String ipAddress = IpAddressUtil.getIpAddress(req);
+
 
         String sql = "" +
                 "SELECT\n" +
@@ -76,9 +81,10 @@ public class ArticleList extends HttpServlet {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
         JSONObject result = new JSONObject();
+
         try {
             while (resultSet.next()) {
-                HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                HashMap<String, Object> hashMap = new HashMap<>();
                 hashMap.put("article_id", resultSet.getLong("article_id"));
                 hashMap.put("user_id", resultSet.getLong("user_id"));
                 hashMap.put("article_title", resultSet.getString("article_title"));
@@ -89,6 +95,8 @@ public class ArticleList extends HttpServlet {
                 hashMap.put("username", resultSet.getString("username"));
                 hashMap.put("label_parent_name", resultSet.getString("label_parent_name"));
                 hashMap.put("label_name", resultSet.getString("label_name"));
+                boolean commend = ArticleService.isCommend(ipAddress, resultSet.getLong("article_id"));
+                hashMap.put("isCommend", commend);
                 jsonArray.add(hashMap);
             }
 
@@ -102,9 +110,12 @@ public class ArticleList extends HttpServlet {
             jsonObject = Result.success(result);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        dbUtil.closeDbConnection();
+        } finally {
+            System.out.println("closeDbConnection");
 
+        }
+
+        dbUtil.closeDbConnection();
         PrintWriter printWriter = resp.getWriter();
         printWriter.write(jsonObject.toString());
 
