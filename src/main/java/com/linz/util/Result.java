@@ -18,6 +18,22 @@ public class Result {
         return jsonObject;
     }
 
+    public static JSONObject success(ResultCode resultCode, Object result) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", resultCode.getCode());
+        jsonObject.put("message", resultCode.getMessage());
+        jsonObject.put("data", result);
+        return jsonObject;
+    }
+
+    public static JSONObject success(ResultCode resultCode) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", resultCode.getCode());
+        jsonObject.put("message", resultCode.getMessage());
+        return jsonObject;
+    }
+
+
     /**
      * 返回成功消息
      */

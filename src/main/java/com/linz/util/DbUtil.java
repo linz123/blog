@@ -19,7 +19,6 @@ public class DbUtil {
 
     /**
      * 链接数据库，返回连接对象
-     *
      */
     private void getDbConnection() {
 
@@ -46,7 +45,7 @@ public class DbUtil {
      * @param params      参数列表
      * @return ResultSet 数据集
      */
-    public ResultSet executeQuery(String preparedSql, ArrayList<Object> params) {
+    public  <T> ResultSet  executeQuery(String preparedSql, ArrayList<T> params) {
 
         try {
             preparedStatement = connection.prepareStatement(preparedSql);
@@ -71,7 +70,7 @@ public class DbUtil {
      * @param params      参数列表
      * @return boolean 是否成功
      */
-    public boolean executeUpdate(String preparedSql, ArrayList<Object> params) throws SQLException {
+    public <E> boolean executeUpdate(String preparedSql, ArrayList<E> params) throws SQLException {
 
         int num = -1;
 
@@ -85,6 +84,26 @@ public class DbUtil {
 
         return num > 0;
     }
+
+
+    public <E> ResultSet executeUpdateMulti(String preparedSql, ArrayList<E> params) throws SQLException {
+
+        preparedStatement = connection.prepareStatement(preparedSql, Statement.RETURN_GENERATED_KEYS);
+        if (params != null) {
+            for (int i = 0; i < params.size(); i++) {
+                preparedStatement.setObject(i + 1, params.get(i));
+            }
+        }
+        preparedStatement.executeUpdate();
+
+        return preparedStatement.getGeneratedKeys();
+    }
+
+
+    public PreparedStatement getPrepareStatement(String preparedSql) throws SQLException {
+        return connection.prepareStatement(preparedSql);
+    }
+
 
     //关闭数据库连接
     public void closeDbConnection() {

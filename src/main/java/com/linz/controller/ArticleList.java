@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-@WebServlet("/articleList")
+@WebServlet("/api/articleList")
 public class ArticleList extends HttpServlet {
 
     @Override
@@ -45,18 +45,9 @@ public class ArticleList extends HttpServlet {
                 "	article_comment_count,\n" +
                 "	article_date,\n" +
                 "	article_like_count,\n" +
-                "	username,\n" +
-                "	label_parent_name,\n" +
-                "	label_name\n" +
-                "FROM\n" +
-                "	(\n" +
-                "		(\n" +
-                "			articles\n" +
-                "			INNER JOIN manger_user ON articles.user_id = manger_user.uid\n" +
-                "		)\n" +
-                "		LEFT JOIN article_set_label ON articles.article_id = article_set_label.article_id\n" +
-                "	)\n" +
-                "LEFT JOIN label ON label.label_id = article_set_label.label_id LIMIT " + start + "," + pageSize + ";";
+                "	username\n" +
+                "FROM articles\n" +
+                "INNER JOIN manger_user ON articles.user_id = manger_user.uid LIMIT " + start + "," + pageSize + ";";
 
 
         ResultSet resultSet = dbUtil.executeQuery(sql, null);
@@ -64,16 +55,8 @@ public class ArticleList extends HttpServlet {
         String count =
                 "SELECT\n" +
                         "	COUNT(*) as total\n" +
-                        "FROM\n" +
-                        "	(\n" +
-                        "		(\n" +
-                        "			articles\n" +
-                        "			INNER JOIN manger_user ON articles.user_id = manger_user.uid\n" +
-                        "		)\n" +
-                        "		LEFT JOIN article_set_label ON articles.article_id = article_set_label.article_id\n" +
-                        "	)\n" +
-                        "LEFT JOIN label ON label.label_id = article_set_label.label_id;";
-
+                        "FROM articles\n" +
+                        "			INNER JOIN manger_user ON articles.user_id = manger_user.uid";
 
         ResultSet totalCount = dbUtil.executeQuery(count, null);
 
@@ -93,8 +76,8 @@ public class ArticleList extends HttpServlet {
                 hashMap.put("article_date", resultSet.getTimestamp("article_date"));
                 hashMap.put("article_like_count", resultSet.getLong("article_like_count"));
                 hashMap.put("username", resultSet.getString("username"));
-                hashMap.put("label_parent_name", resultSet.getString("label_parent_name"));
-                hashMap.put("label_name", resultSet.getString("label_name"));
+                ArrayList<String> labels = ArticleService.articleLabels(resultSet.getLong("article_id"), dbUtil);
+                hashMap.put("labels", labels);
                 boolean commend = ArticleService.isCommend(ipAddress, resultSet.getLong("article_id"));
                 hashMap.put("isCommend", commend);
                 jsonArray.add(hashMap);

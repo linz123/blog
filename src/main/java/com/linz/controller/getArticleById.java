@@ -18,9 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
-@WebServlet("/getArticleById")
+@WebServlet("/api/getArticleById")
 public class getArticleById extends HttpServlet {
 
     @Override
@@ -46,19 +47,11 @@ public class getArticleById extends HttpServlet {
                     "	article_comment_count,\n" +
                     "	article_date,\n" +
                     "	article_like_count,\n" +
-                    "	username,\n" +
-                    "	label_parent_name,\n" +
-                    "	label_name\n" +
-                    "   FROM\n" +
-                    "	(\n" +
-                    "		(\n" +
-                    "			articles \n" +
-                    "			INNER JOIN manger_user ON articles.user_id = manger_user.uid AND \n" +
-                    "           articles.article_id = " + long_article_id + "\n" +
-                    "		)\n" +
-                    "		LEFT JOIN  article_set_label ON articles.article_id = article_set_label.article_id\n" +
-                    "	)\n" +
-                    "LEFT JOIN label ON label.label_id = article_set_label.label_id  ;";
+                    "	username\n" +
+                    "   FROM articles \n" +
+                    "	INNER JOIN manger_user ON articles.user_id = manger_user.uid AND \n" +
+                    "   articles.article_id = " + long_article_id;
+
             ResultSet resultSet = dbUtil.executeQuery(sql, null);
 
             String articleViewsSql =
@@ -85,9 +78,9 @@ public class getArticleById extends HttpServlet {
                     hashMap.put("article_date", resultSet.getTimestamp("article_date"));
                     hashMap.put("article_like_count", resultSet.getLong("article_like_count"));
                     hashMap.put("username", resultSet.getString("username"));
-                    hashMap.put("label_parent_name", resultSet.getString("label_parent_name"));
-                    hashMap.put("label_name", resultSet.getString("label_name"));
                     boolean commend = ArticleService.isCommend(ipAddress, resultSet.getLong("article_id"));
+                    ArrayList<String> labels = ArticleService.articleLabels(long_article_id, dbUtil);
+                    hashMap.put("labels", labels);
                     hashMap.put("isCommend", commend);
                     jsonArray.add(hashMap);
                 }

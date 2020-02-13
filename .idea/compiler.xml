@@ -10,13 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="blog" target="7" />
+      <module name="blog" target="1.7" />
     </bytecodeTargetLevel>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-encoding utf-8" />
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="blog" options="" />
-    </option>
   </component>
 </project>

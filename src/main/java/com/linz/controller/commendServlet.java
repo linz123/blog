@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@WebServlet("/commend")
+@WebServlet("/api/commend")
 public class commendServlet extends HttpServlet {
 
     @Override
