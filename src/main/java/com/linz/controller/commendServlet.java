@@ -75,6 +75,7 @@ public class commendServlet extends HttpServlet {
                         printWriter.write(result.toString());
                     }
                 } catch (SQLException e) {
+                    e.printStackTrace();
                     connection.rollback();
                     JSONObject result = Result.failure(ResultCode.FAIL_TO_ADD);
                     printWriter.write(result.toString());
